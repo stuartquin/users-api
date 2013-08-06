@@ -10,17 +10,42 @@ app.configure( function(){
  app.use(express.static(__dirname + "/public"));
 });
 
-var loadControllers = function(app, models){
-  // Load Controllers
-  // To be generalised...
-  var Contacts = require("./controllers/contacts.js").Contacts;
+/**
+ * 'require's all js files in a given directory
+ * returns [filename(no ext)] = module
+ */
+var moduleLoader = function(dir){
+  var files = fs.readdirSync(dir);
+  var modules = {};
 
-  var contacts = new Contacts(models);
-  contacts.routes.forEach(function(route){
-    var path = "/" + contacts.path + route.path;
+  files.forEach(function(file){
+    if(file.substr(file.length-3) == ".js"){
+      var name = file.substr(0, file.length-3);
+      modules[name] = require(dir+file);
+    }
+  });
+
+  return modules;
+};
+
+var loadControllers = function(app, models){
+  var modules = moduleLoader("./controllers/");
+
+  for( var name in modules ){
+    var controller = new modules[name].Controller(models);
+    assignRoutes(controller);
+  }
+};
+
+/**
+ * Setup routes based on required route object in controllers
+ */
+var assignRoutes = function(controller){
+  controller.routes.forEach(function(route){
+    var path = "/" + controller.path + route.path;
 
     app[route.verb](path, function(req, res){
-      route.handler.call(contacts, req, res);
+      route.handler.call(controller, req, res);
     });
   });
 };
@@ -35,6 +60,6 @@ db.once("open", function(){
   loadControllers(app, models);
 });
 
-
-
-app.listen(3000);
+var port = 3000;
+app.listen(port);
+console.log("App started", port);

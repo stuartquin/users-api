@@ -26,4 +26,4 @@ var Contacts = (function() {
   return Contacts;
 })();
 
-exports.Contacts = Contacts;
+exports.Controller = Contacts;
