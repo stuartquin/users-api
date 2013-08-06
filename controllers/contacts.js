@@ -6,7 +6,7 @@ var Contacts = (function() {
         {verb: "post", path: "/", handler: this.post},
     ];
 
-    this.ContactModel = models.contact;
+    this.ContactModel = models.contact.Contact;
   }
 
   Contacts.prototype.get = function(req, res){
@@ -26,4 +26,4 @@ var Contacts = (function() {
   return Contacts;
 })();
 
-exports.Controller = Contacts;
+exports.Contacts = Contacts;

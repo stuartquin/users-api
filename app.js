@@ -11,7 +11,8 @@ app.configure( function(){
 });
 
 /**
- * 'require's all js files in a given directory
+ * 'require's all js files in a given directory and grab the exports.exportName
+ * value
  * returns [filename(no ext)] = module
  */
 var moduleLoader = function(dir){
@@ -32,9 +33,23 @@ var loadControllers = function(app, models){
   var modules = moduleLoader("./controllers/");
 
   for( var name in modules ){
-    var controller = new modules[name].Controller(models);
+    var exportName = name.substr(0,1).toUpperCase() + name.substr(1);
+    var controller = new modules[name][exportName](models);
     assignRoutes(controller);
   }
+};
+
+/**
+ * Grab mongoose connection, load models
+ */
+var loadModels = function(app, cb){
+  // Load Models
+  mongoose.connect('mongodb://localhost/test');
+  var db = mongoose.connection;
+  db.once("open", function(){
+    // Now we can load our models
+    cb(moduleLoader("./models/"));
+  });
 };
 
 /**
@@ -50,15 +65,10 @@ var assignRoutes = function(controller){
   });
 };
 
-// Load Models
-mongoose.connect('mongodb://localhost/test');
-var db = mongoose.connection;
-db.once("open", function(){
-  // Now we can load our models
-  var models = {};
-  models["contact"] = require("./models/contact").Contact;
+loadModels(app, function(models){
   loadControllers(app, models);
 });
+
 
 var port = 3000;
 app.listen(port);
