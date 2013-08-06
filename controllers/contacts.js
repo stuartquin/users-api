@@ -5,7 +5,8 @@ var Contacts = (function() {
     this.path = "contacts";
     this.routes = [
       {verb: "get", path: "/", handler: this.get},
-      {verb: "post", path: "/", handler: this.post},
+      {verb: "post", path: "/", handler: this.create_contact},
+      {verb: "post", path: "/:email/note/", handler: this.create_note},
     ];
 
     this.ContactModel = models.contact.Contact;
@@ -18,11 +19,22 @@ var Contacts = (function() {
     });
   };
   
-  Contacts.prototype.post = function(req, res){
+  Contacts.prototype.create_contact = function(req, res){
     var contact = new this.ContactModel(req.body);
     contact.save(function(err, contact){
-      console.log("Saved");
       res.end(JSON.stringify(contact.toObject()));
+    });
+  };
+
+  Contacts.prototype.create_note = function(req, res){
+    var email = req.params.email;
+    var content = req.body.content;
+
+    this.ContactModel.findOne({email: email}, function(err, contact){
+      contact.notes.push({content: content});
+      contact.save(function(err, contact){
+        res.end(JSON.stringify(contact.toObject()));
+      });
     });
   };
 

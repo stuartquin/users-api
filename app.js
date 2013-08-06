@@ -59,6 +59,7 @@ var assignRoutes = function(controller){
   controller.routes.forEach(function(route){
     var path = "/" + controller.path + route.path;
 
+    console.log("REGISTERED ROUTE", route.verb, path);
     app[route.verb](path, function(req, res){
       route.handler.call(controller, req, res);
     });
@@ -68,7 +69,6 @@ var assignRoutes = function(controller){
 loadModels(app, function(models){
   loadControllers(app, models);
 });
-
 
 var port = 3000;
 app.listen(port);
