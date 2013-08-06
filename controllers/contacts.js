@@ -1,13 +1,16 @@
+var Controller = require("../base/controller").Controller;
+
 var Contacts = (function() {
   function Contacts(models) {
     this.path = "contacts";
     this.routes = [
-        {verb: "get", path: "/", handler: this.get},
-        {verb: "post", path: "/", handler: this.post},
+      {verb: "get", path: "/", handler: this.get},
+      {verb: "post", path: "/", handler: this.post},
     ];
 
     this.ContactModel = models.contact.Contact;
   }
+  Contacts.prototype = new Controller();
 
   Contacts.prototype.get = function(req, res){
     this.ContactModel.find().exec(function(err, contacts){
