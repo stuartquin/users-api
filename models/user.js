@@ -20,7 +20,8 @@ var UserSchema = mongoose.Schema({
 var reasons = {
   NOT_FOUND: 0,
   BAD_PASSWORD: 1,
-  MAX_ATTEMPTS: 2
+  MAX_ATTEMPTS: 2,
+  LOCK_TIME: 3
 };
 
 UserSchema.pre("save", function(next){
@@ -57,7 +58,7 @@ UserSchema.statics.authenticate = function(email, password, cb){
     }
 
     if (user.lock_until && user.lock_until > (new Date()).getTime()) {
-      return cb(null, null, reasons.MAX_ATTEMPTS); 
+      return cb(null, null, reasons.LOCK_TIME); 
     }
 
     if (user.login_attempts >= MAX_ATTEMPTS){
