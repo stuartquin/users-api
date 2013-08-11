@@ -12,6 +12,7 @@ var Users = (function() {
 
     this.UserModel = models.user.User;
   }
+
   Users.prototype = new Controller();
 
   Users.prototype.get = function(req, res){
@@ -24,17 +25,16 @@ var Users = (function() {
     var _that = this;
     var email = req.body.email;
     var password = req.body.password;
+    this.UserModel.authenticate(email, password, function(err, user, reason){
+      if (err || (!user && reason) ){
+        _that.logger.info("Login failure %s", email);
+        return res.send(404, {"error": "login failure"});
+      }
 
-    this.UserModel.findOne({email: email}).exec(function(err, user){
-      if (err) throw err; 
-      user.comparePassword(password, function(err, match){
-        if (err) throw err;
-        if (match) {
-        }
-      });
+      return res.json(user.toObject());
     });
   };
-  
+
   Users.prototype.createUser = function(req, res){
     var user = new this.UserModel(req.body);
     user.save(function(err, user){

@@ -3,8 +3,8 @@ var bcrypt = require("bcrypt"),
     Schema = mongoose.Schema,
     ObjectId = Schema.ObjectId,
     SALT_WORK_FACTOR = 10,
-    MAX_ATTEMPTES = 5,
-    LOCK_TIME = 15 * 60 * 1000; // Lock for 15 mins
+    MAX_ATTEMPTS = 5,
+    LOCK_TIME = 3 * 60 * 1000; // Lock for 3 mins
 
 var UserSchema = mongoose.Schema({
   account_id: ObjectId,
@@ -14,7 +14,7 @@ var UserSchema = mongoose.Schema({
   properties: Object,
   created_at: {type: Date, default: Date.now},
   lock_until: Number,
-  login_attemps: {type: Number, default: 0}
+  login_attempts: {type: Number, default: 0}
 }, {strict: true});
 
 var reasons = {
@@ -53,10 +53,39 @@ UserSchema.statics.authenticate = function(email, password, cb){
     if (err) return cb(err);
 
     if (!user) {
-      cb(null, null, reasons.NOT_FOUND);
+      return cb(null, null, reasons.NOT_FOUND);
+    }
+
+    if (user.lock_until && user.lock_until > (new Date()).getTime()) {
+      return cb(null, null, reasons.MAX_ATTEMPTS); 
+    }
+
+    if (user.login_attempts >= MAX_ATTEMPTS){
+      user.lock_until = (new Date()).getTime() + LOCK_TIME;
+      user.login_attempts = 0;
+      user.save(function(err, user){
+        return cb(null, null, reasons.MAX_ATTEMPTS); 
+      });
+    } else {
+      user.comparePassword(password, function(err, match){
+        if (err) return cb(err);
+        if (match) {
+          // Log success
+          user.login_attempts = 0;
+          user.lock_until = null;
+          user.save(function(err, user){
+            return cb(null, user);
+          });
+        } else {
+          user.login_attempts = user.login_attempts + 1;
+          user.save(function(err, user){
+            return cb(null, null, reasons.BAD_PASSWORD); 
+          });
+        }
+      });
     }
   });
 };
 
-
 exports.User = mongoose.model("User", UserSchema);
+exports.User.AuthFailReasons = reasons;
