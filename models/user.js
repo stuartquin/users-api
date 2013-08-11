@@ -1,4 +1,4 @@
-var bcrypt = requir("bcrypt"),
+var bcrypt = require("bcrypt"),
     mongoose = require("mongoose"),
     Schema = mongoose.Schema,
     ObjectId = Schema.ObjectId,
@@ -8,8 +8,9 @@ var UserSchema = mongoose.Schema({
   account_id: ObjectId,
   email: String,
   name: String,
-  password: String
-});
+  password: String,
+  properties: Object
+}, {strict: true});
 
 UserSchema.pre("save", function(next){
   var _that = this;

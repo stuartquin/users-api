@@ -10,7 +10,6 @@ var Users = (function() {
     ];
 
     this.UserModel = models.user.User;
-
   }
   Users.prototype = new Controller();
 
