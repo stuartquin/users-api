@@ -16,7 +16,7 @@ var setupLogger = function(){
   var logger = new (winston.Logger)({
     transports: [
       // new (winston.transports.File)({ filename: 'usersapi.log' }),
-      new (winston.transports.Console)({level: "info", colorize: true})
+      new (winston.transports.Console)({level: "info", colorize: true, timestamp: true})
     ]
   });
   return logger;
@@ -46,7 +46,7 @@ var loadControllers = function(logger, models){
 
   for( var name in modules ){
     var exportName = name.substr(0,1).toUpperCase() + name.substr(1);
-    var controller = new modules[name][exportName](models);
+    var controller = new modules[name][exportName](models, logger);
     assignRoutes(logger, controller);
   }
 };
