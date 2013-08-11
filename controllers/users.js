@@ -5,7 +5,7 @@ var Users = (function() {
     this.path = "users";
     this.routes = [
       {verb: "get", path: "/", handler: this.get},
-      {verb: "post", path: "/", handler: this.create_user}
+      {verb: "post", path: "/", handler: this.createUser}
     ];
 
     this.UserModel = models.user.User;
@@ -18,7 +18,7 @@ var Users = (function() {
     });
   };
   
-  Users.prototype.create_user = function(req, res){
+  Users.prototype.createUser = function(req, res){
     var user = new this.UserModel(req.body);
     user.save(function(err, user){
       res.end(JSON.stringify(user.toObject()));

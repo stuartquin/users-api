@@ -1,7 +1,9 @@
-var mongoose = require("mongoose");
-var express = require("express");
-var fs = require("fs");
-var app = express();
+var mongoose = require("mongoose"),
+    express = require("express"),
+    fs = require("fs"),
+    app = express(),
+    winston = require("winston");
+
 
 app.configure( function(){
  app.use(express.bodyParser())
@@ -9,6 +11,16 @@ app.configure( function(){
  app.use(app.router);
  app.use(express.static(__dirname + "/public"));
 });
+
+var setupLogger = function(){
+  var logger = new (winston.Logger)({
+    transports: [
+      // new (winston.transports.File)({ filename: 'usersapi.log' }),
+      new (winston.transports.Console)({level: "info", colorize: true})
+    ]
+  });
+  return logger;
+};
 
 /**
  * 'require's all js files in a given directory and grab the exports.exportName
@@ -29,20 +41,20 @@ var moduleLoader = function(dir){
   return modules;
 };
 
-var loadControllers = function(app, models){
+var loadControllers = function(logger, models){
   var modules = moduleLoader("./controllers/");
 
   for( var name in modules ){
     var exportName = name.substr(0,1).toUpperCase() + name.substr(1);
     var controller = new modules[name][exportName](models);
-    assignRoutes(controller);
+    assignRoutes(logger, controller);
   }
 };
 
 /**
  * Grab mongoose connection, load models
  */
-var loadModels = function(app, cb){
+var loadModels = function(logger, cb){
   // Load Models
   mongoose.connect('mongodb://localhost/users-api');
   var db = mongoose.connection;
@@ -55,22 +67,24 @@ var loadModels = function(app, cb){
 /**
  * Setup routes based on required route object in controllers
  */
-var assignRoutes = function(controller){
+var assignRoutes = function(logger, controller){
   controller.routes.forEach(function(route){
     var path = "/" + controller.path + route.path;
 
-    console.log("REGISTERED ROUTE", route.verb, path);
+    logger.info("Route: [%s] %s", route.verb, path);
+
     app[route.verb](path, function(req, res){
       route.handler.call(controller, req, res);
     });
   });
 };
 
-loadModels(app, function(models){
-  console.log("Loaded ", models);
-  loadControllers(app, models);
+var logger = setupLogger();
+
+loadModels(logger, function(models){
+  loadControllers(logger, models);
 });
 
 var port = 3000;
 app.listen(port);
-console.log("App started", port);
+logger.info("Running on %d ", port);
