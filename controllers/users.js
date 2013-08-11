@@ -5,8 +5,7 @@ var Users = (function() {
     this.path = "users";
     this.routes = [
       {verb: "get", path: "/", handler: this.get},
-      {verb: "post", path: "/", handler: this.create_user},
-      {verb: "post", path: "/:email/note/", handler: this.create_note},
+      {verb: "post", path: "/", handler: this.create_user}
     ];
 
     this.UserModel = models.user.User;
