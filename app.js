@@ -44,7 +44,7 @@ var loadControllers = function(app, models){
  */
 var loadModels = function(app, cb){
   // Load Models
-  mongoose.connect('mongodb://localhost/test');
+  mongoose.connect('mongodb://localhost/users-api');
   var db = mongoose.connection;
   db.once("open", function(){
     // Now we can load our models
@@ -67,6 +67,7 @@ var assignRoutes = function(controller){
 };
 
 loadModels(app, function(models){
+  console.log("Loaded ", models);
   loadControllers(app, models);
 });
 
