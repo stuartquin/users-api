@@ -12,6 +12,6 @@ func handler(w http.ResponseWriter, r *http.Request) {
 
 func main() {
 	http.HandleFunc("/", handler)
-	http.HandleFunc("/create", controllers.CreateUser)
+	http.HandleFunc("/user", controllers.User)
 	http.ListenAndServe(":8080", nil)
 }

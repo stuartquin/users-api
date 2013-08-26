@@ -8,6 +8,15 @@ import (
 	"github.com/stuartquin/usersapi/models"
 )
 
+func User(w http.ResponseWriter, r *http.Request) {
+    switch {
+        case r.Method == "POST":
+            CreateUser(w, r)
+        case r.Method == "GET":
+            GetUser(w, r)
+    }
+}
+
 func CreateUser(w http.ResponseWriter, r *http.Request) {
     if r.Method == "POST" {
         // receive posted data
@@ -24,5 +33,13 @@ func CreateUser(w http.ResponseWriter, r *http.Request) {
 	        fmt.Println(err)
 	        fmt.Fprintf(w, "Email already exists")
         }
+    }
+}
+
+func GetUser(w http.ResponseWriter, r *http.Request) {
+    if r.Method == "GET" {
+        r.ParseForm()
+        fmt.Println(r.URL)
+        fmt.Println(r.Form)
     }
 }
