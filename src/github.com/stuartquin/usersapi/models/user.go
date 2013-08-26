@@ -15,7 +15,7 @@ func (u *User) Output() string {
 	return result
 }
 
-func (u *User) Save() {
+func (u *User) Save() (bool, error) {
     // Establish a session, pools are managed by mgo
     session, err := mgo.Dial("localhost")
     if err != nil {
@@ -27,6 +27,8 @@ func (u *User) Save() {
     err = c.Insert(u)
 
     if err != nil {
-        panic(err)
+        return false, err
     }
+
+    return true, nil
 }

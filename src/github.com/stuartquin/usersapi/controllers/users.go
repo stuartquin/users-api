@@ -18,7 +18,11 @@ func CreateUser(w http.ResponseWriter, r *http.Request) {
         if err != nil {
 	        fmt.Fprintf(w, "Error...")
         }
-	    fmt.Fprintf(w, "%+s", user.Email)
-        user.Save()
+        _, err = user.Save()
+
+        if err != nil {
+	        fmt.Println(err)
+	        fmt.Fprintf(w, "Email already exists")
+        }
     }
 }
