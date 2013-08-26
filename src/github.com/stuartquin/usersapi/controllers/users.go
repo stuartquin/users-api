@@ -19,5 +19,6 @@ func CreateUser(w http.ResponseWriter, r *http.Request) {
 	        fmt.Fprintf(w, "Error...")
         }
 	    fmt.Fprintf(w, "%+s", user.Email)
+        user.Save()
     }
 }
