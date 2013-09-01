@@ -40,10 +40,11 @@ func GetUser(w http.ResponseWriter, r *http.Request) {
     if r.Method == "GET" {
         r.ParseForm()
         params := r.Form
-
         if len(params["email"]) > 0 {
             email := params["email"][0]
-            fmt.Println(email)
+
+            user := models.GetByEmail(email)
+            fmt.Println(user)
         }
 
     }

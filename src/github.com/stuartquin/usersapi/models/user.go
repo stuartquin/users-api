@@ -10,11 +10,6 @@ type User struct {
 	Active bool
 }
 
-func (u *User) Output() string {
-	result := "Hello " + u.Email
-	return result
-}
-
 func (u *User) Save() (bool, error) {
     // Establish a session, pools are managed by mgo
     session, err := mgo.Dial("localhost")
@@ -31,4 +26,8 @@ func (u *User) Save() (bool, error) {
     }
 
     return true, nil
+}
+
+func GetByEmail(email string) (User) {
+    return User{email,"secret",true}
 }
