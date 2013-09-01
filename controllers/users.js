@@ -5,8 +5,9 @@ var Users = (function() {
     this.logger = logger;
     this.path = "users";
     this.routes = [
-      {verb: "get", path: "/", handler: this.get},
-      {verb: "post", path: "/", handler: this.createUser},
+      {verb: "get", path: "", handler: this.get},
+      {verb: "get", path: "/:id", handler: this.getById},
+      {verb: "post", path: "", handler: this.createUser},
       {verb: "post", path: "/auth", handler: this.authUser}
     ];
 
@@ -14,6 +15,17 @@ var Users = (function() {
   }
 
   Users.prototype = new Controller();
+
+  Users.prototype.getById = function(req, res){
+    var query = {};
+    if( req.params.id ){
+      query._id = req.params.id;
+    }
+
+    this.UserModel.findOne(query).exec(function(err, user){
+      res.end(JSON.stringify(user));
+    });
+  };
 
   Users.prototype.get = function(req, res){
     this.UserModel.find().exec(function(err, users){

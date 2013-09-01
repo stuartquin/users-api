@@ -4,10 +4,17 @@ var mongoose = require("mongoose"),
     app = express(),
     winston = require("winston");
 
+var allowCrossDomain = function(req, res, next) {
+    res.header('Access-Control-Allow-Origin', "*");
+    res.header('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE');
+    res.header('Access-Control-Allow-Headers', 'Content-Type');
+    next();
+};
 
 app.configure( function(){
   app.use(express.bodyParser())
   app.use(express.methodOverride());
+  app.use(allowCrossDomain);
   app.use(app.router);
   app.use(express.static(__dirname + "/public"));
 });
