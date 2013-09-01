@@ -7,6 +7,7 @@ var Users = (function() {
     this.routes = [
       {verb: "get", path: "", handler: this.get},
       {verb: "get", path: "/:id", handler: this.getById},
+      {verb: "put", path: "/:id", handler: this.update},
       {verb: "post", path: "", handler: this.createUser},
       {verb: "post", path: "/auth", handler: this.authUser}
     ];
@@ -31,6 +32,21 @@ var Users = (function() {
     this.UserModel.find().exec(function(err, users){
       var response = {users: users};
       res.end(JSON.stringify(response));
+    });
+  };
+
+  Users.prototype.update = function(req, res){
+    if( !req.body.user ){
+      return res.send(403, {"error": "bad data"});
+    }  
+
+    var query = {};
+    if( req.params.id ){
+      query._id = req.params.id;
+    }
+
+    this.UserModel.update(query, req.body.user, {}, function(err, user){
+      return res.json(user);
     });
   };
 
