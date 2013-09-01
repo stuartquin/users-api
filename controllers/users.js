@@ -29,7 +29,8 @@ var Users = (function() {
 
   Users.prototype.get = function(req, res){
     this.UserModel.find().exec(function(err, users){
-      res.end(JSON.stringify(users));
+      var response = {users: users};
+      res.end(JSON.stringify(response));
     });
   };
 
@@ -48,7 +49,11 @@ var Users = (function() {
   };
 
   Users.prototype.createUser = function(req, res){
-    var user = new this.UserModel(req.body);
+    if( !req.body.user ){
+      return res.send(403, {"error": "bad data"});
+    }  
+
+    var user = new this.UserModel(req.body.user);
     user.save(function(err, user){
       res.end(JSON.stringify(user.toObject()));
     });
